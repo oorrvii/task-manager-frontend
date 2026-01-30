@@ -15,11 +15,16 @@ const Dashboard = () => {
   const [error, setError] = useState(null); // general error message
   const [loadingTaskId, setLoadingTaskId] = useState(null); // for individual task actions
 
-  // Load tasks from backend
+  // Get JWT token from localStorage (set after login)
+  const token = localStorage.getItem("token");
+
+  // Load tasks from backend for the logged-in user
   useEffect(() => {
     const loadTasks = async () => {
+      if (!token) return; // no tasks if not logged in
+
       try {
-        const data = await getTasks();
+        const data = await getTasks(token); // pass token to API
         setTasks(data);
       } catch (err) {
         console.error(err);
@@ -29,13 +34,14 @@ const Dashboard = () => {
       }
     };
     loadTasks();
-  }, []);
+  }, [token]);
 
   // Add new task
   const addTask = async (text) => {
+    if (!token) return;
     setError(null);
     try {
-      const newTask = await addTaskAPI(text);
+      const newTask = await addTaskAPI(text, token); // pass token
       setTasks((prev) => [newTask, ...prev]);
     } catch (err) {
       console.error(err);
@@ -45,6 +51,7 @@ const Dashboard = () => {
 
   // Delete task
   const deleteTask = async (_id) => {
+    if (!token) return;
     setLoadingTaskId(_id);
     setError(null);
     const originalTasks = [...tasks];
@@ -52,7 +59,7 @@ const Dashboard = () => {
     setTasks((prev) => prev.filter((t) => t._id !== _id)); // optimistic UI
 
     try {
-      await deleteTaskAPI(_id);
+      await deleteTaskAPI(_id, token); // pass token
     } catch (err) {
       console.error(err);
       setTasks(originalTasks); // rollback
@@ -64,6 +71,7 @@ const Dashboard = () => {
 
   // Toggle completion
   const toggleComplete = async (_id) => {
+    if (!token) return;
     setLoadingTaskId(_id);
     setError(null);
     const task = tasks.find((t) => t._id === _id);
@@ -74,7 +82,7 @@ const Dashboard = () => {
     );
 
     try {
-      await toggleTaskCompletion(_id, newStatus);
+      await toggleTaskCompletion(_id, newStatus, token); // pass token
     } catch (err) {
       console.error(err);
       // rollback
@@ -106,22 +114,26 @@ const Dashboard = () => {
   };
 
   // Save edited task
- const saveEdit = async (id, text) => {
-  try {
-    const updatedTask = await updateTaskAPI(id, { text });
+  const saveEdit = async (id, text) => {
+    if (!token) return;
+    try {
+      const updatedTask = await updateTaskAPI(id, { text }, token); // pass token
 
-    setTasks(prev =>
-      prev.map(task =>
-        task._id === id
-          ? { ...updatedTask, isEditing: false }
-          : task
-      )
-    );
-  } catch (err) {
-    console.error(err);
-    alert("Failed to save task");
+      setTasks((prev) =>
+        prev.map((task) =>
+          task._id === id ? { ...updatedTask, isEditing: false } : task
+        )
+      );
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save task");
+    }
+  };
+
+  if (!token) {
+    return <p>Please log in to see your tasks.</p>;
   }
-};
+
   return (
     <div className="dashboard">
       <h1 className="title">Task Dashboard</h1>
@@ -204,4 +216,5 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
 
