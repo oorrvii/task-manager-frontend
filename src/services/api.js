@@ -30,16 +30,22 @@ export const deleteTask = async (_id) => {
 };
 
 // Update task text by _id
-export const updateTaskText = async (_id, text) => {
-  const res = await fetch(`${BASE_URL}/tasks/${_id}`, {
-    method: "PUT",
+export const updateTaskAPI = async (id, data) => {
+  const res = await fetch(`${BASE_URL}/tasks/${id}`, {
+    method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text }),
+    body: JSON.stringify(data),
   });
 
-  if (!res.ok) throw new Error("Failed to update task");
-  return res.json();
+  // 🔴 DON'T THROW BEFORE reading response
+  const result = await res.json();
+  if (!res.ok) {
+    throw new Error(result.error || "Update failed");
+  }
+
+  return result;
 };
+
 
 // Toggle task completion by _id
 export const toggleTaskCompletion = async (_id, completed) => {

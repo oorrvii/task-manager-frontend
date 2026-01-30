@@ -106,31 +106,20 @@ const Dashboard = () => {
   };
 
   // Save edited task
-  const saveEdit = async (_id, newText) => {
-    setLoadingTaskId(_id);
-    setError(null);
-    const originalTask = tasks.find((t) => t._id === _id);
+  const saveEdit = async (id, newText) => {
+  try {
+    const updatedTask = await updateTaskAPI(id, { text: newText });
 
     setTasks((prev) =>
-      prev.map((t) => (_id === t._id ? { ...t, text: newText, isEditing: false } : t))
+      prev.map((task) =>
+        task._id === id ? { ...updatedTask, isEditing: false } : task
+      )
     );
-
-    try {
-      await updateTaskText(_id, newText);
-    } catch (err) {
-      console.error(err);
-      // rollback
-      setTasks((prev) =>
-        prev.map((t) =>
-          t._id === _id ? { ...t, text: originalTask.text, isEditing: false } : t
-        )
-      );
-      setError("Failed to save task.");
-    } finally {
-      setLoadingTaskId(null);
-    }
-  };
-
+  } catch (err) {
+    console.error("Failed to save task", err);
+    alert("Failed to save task");
+  }
+};
   if (loading) return <p>Loading tasks...</p>;
 
   return (
