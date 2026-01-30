@@ -6,7 +6,7 @@ import {
   addTask as addTaskAPI,
   deleteTask as deleteTaskAPI,
   toggleTaskCompletion,
-  updateTaskText,
+  updateTaskText as updateTaskAPI,
 } from "../services/api.js";
 
 const Dashboard = () => {
