@@ -30,21 +30,27 @@ export const deleteTask = async (_id) => {
 };
 
 // Update task text by _id
-export const updateTaskAPI = async (id, data) => {
+export const updateTaskAPI = async (id, updates) => {
   const res = await fetch(`${BASE_URL}/tasks/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+    body: JSON.stringify(updates),
   });
 
-  // 🔴 DON'T THROW BEFORE reading response
-  const result = await res.json();
-  if (!res.ok) {
-    throw new Error(result.error || "Update failed");
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    throw new Error("Invalid server response");
   }
 
-  return result;
+  if (!res.ok) {
+    throw new Error(data?.error || "Failed to save task");
+  }
+
+  return data;
 };
+
 
 
 // Toggle task completion by _id

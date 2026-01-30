@@ -106,22 +106,22 @@ const Dashboard = () => {
   };
 
   // Save edited task
-  const saveEdit = async (id, newText) => {
+ const saveEdit = async (id, text) => {
   try {
-    const updatedTask = await updateTaskAPI(id, { text: newText });
+    const updatedTask = await updateTaskAPI(id, { text });
 
-    setTasks((prev) =>
-      prev.map((task) =>
-        task._id === id ? { ...updatedTask, isEditing: false } : task
+    setTasks(prev =>
+      prev.map(task =>
+        task._id === id
+          ? { ...updatedTask, isEditing: false }
+          : task
       )
     );
   } catch (err) {
-    console.error("Failed to save task", err);
+    console.error(err);
     alert("Failed to save task");
   }
 };
-  if (loading) return <p>Loading tasks...</p>;
-
   return (
     <div className="dashboard">
       <h1 className="title">Task Dashboard</h1>
