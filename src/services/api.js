@@ -1,4 +1,4 @@
-const BASE_URL = "https://task-manager-backend-1t4f.onrender.com";
+const BASE_URL = "https://task-manager-backend-h5pl.onrender.com";
 
 // Get all tasks
 export const getTasks = async () => {
