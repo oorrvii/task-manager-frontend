@@ -68,4 +68,5 @@ export const toggleTaskCompletion = async (_id, completed) => {
 // Aliases for clarity
 export const addTaskAPI = addTask;
 export const deleteTaskAPI = deleteTask;
+export const updateTaskText = updateTaskAPI;
 
